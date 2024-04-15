@@ -174,6 +174,7 @@ public class Program {
                 var folder = Dialog.FolderPicker();
                 if (GamePathIsValid(folder?.Path)) {
                     Services.Configuration.GamePath = folder!.Path;
+                    
                     Services.Configuration.Save();
                     Services.InitPostSetup();
                     _state = ProgramState.Main;
@@ -252,10 +253,7 @@ public class Program {
         if (!Directory.Exists(path)) return false;
 
         var dirs = Directory.GetDirectories(path);
-        if (
-            !dirs.Any(f => f.EndsWith("game"))
-            || !dirs.Any(f => f.EndsWith("boot"))
-        ) return false;
+        if (!dirs.Any(f => f.EndsWith("game"))) return false;
 
         return true;
     }
