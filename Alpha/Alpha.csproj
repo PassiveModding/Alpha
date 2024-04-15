@@ -23,6 +23,18 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="Lib\DirectXTexC.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>DirectXTexC.dll</TargetPath>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Reference Include="OtterTex">
+            <HintPath>Lib\OtterTex.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.22.3" />
         <PackageReference Include="Grpc.Tools" Version="2.54.0">
             <PrivateAssets>all</PrivateAssets>

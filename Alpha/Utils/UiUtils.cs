@@ -1,10 +1,13 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using ImGuiNET;
 using Lumina.Data.Files;
 using Lumina.Text;
 using Lumina.Text.Expressions;
 using Lumina.Text.Payloads;
+using OtterTex;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace Alpha.Utils;
 
@@ -21,9 +24,39 @@ public static class UiUtils {
     }
 
     public static void ExportPng(TexFile tex) {
-        var img = Image.LoadPixelData<Bgra32>(tex.ImageData, tex.Header.Width, tex.Header.Height);
+        var meta = new TexMeta 
+        {
+            Width = tex.Header.Width,
+            Height = tex.Header.Height,
+            Depth = 1,
+            MipLevels = tex.Header.MipLevels,
+            ArraySize = 1,
+            Format = (DXGIFormat)TexFile.GetDxgiFormatFromTextureFormat(tex.Header.Format).Item1,
+            Dimension = TexDimension.Tex2D,
+            MiscFlags = tex.Header.Type.HasFlag(TexFile.Attribute.TextureTypeCube)
+                ? D3DResourceMiscFlags.TextureCube
+                : 0,
+            MiscFlags2 = 0,
+        };
+
+        var si = ScratchImage.Initialize(meta);
+            
+        var raw = tex.TextureBuffer.RawData;
+        unsafe 
+        {
+            fixed (byte* data = si.Pixels) 
+            {
+                var span = new Span<byte>(data, si.Pixels.Length);
+                raw.CopyTo(span);
+            }
+        }
+            
+        si.GetRGBA(out var rgba);
+        var rgbaPixels = rgba.Pixels.ToArray();
+        
+        var image = Image.LoadPixelData<Rgba32>(rgbaPixels, si.Meta.Width, si.Meta.Height);
         var bytes = new MemoryStream();
-        img.SaveAsPng(bytes);
+        image.SaveAsPng(bytes);
         FileUtils.Save(bytes.ToArray(), "png");
     }
 

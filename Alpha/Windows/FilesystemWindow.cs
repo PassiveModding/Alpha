@@ -135,6 +135,11 @@ public class FilesystemWindow : Window {
                 if (ImGui.Button("Export as .png")) {
                     UiUtils.ExportPng(texFile);
                 }
+                
+                ImGui.Text($"Width: {size.X}, Height: {size.Y}");
+                ImGui.Text($"Format: {texFile.Header.Format}");
+                ImGui.Text($"Mip levels: {texFile.Header.MipLevels}");
+                ImGui.Text($"Type: {texFile.Header.Type}");
 
                 ImGui.Image(Services.ImageHandler.DisplayTex(texFile), size);
             }
@@ -202,7 +207,6 @@ public class FilesystemWindow : Window {
 
     public void OpenFile(string path) {
         this._selectedPath = path;
-
         if (path.EndsWith("tex")) {
             this._selectedFile = Services.GameData.GetFile<TexFile>(this._selectedPath);
         } else {
